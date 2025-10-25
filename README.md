@@ -24,4 +24,12 @@ y a la vez proporcionar una experiencia óptima para el usuario.
     
   - Github
     
-  - Justinmind
+  - Figma
+
+## Capturas APP:
+
+<img width="270" height="600" alt="Screenshot_20251025_173401" src="https://github.com/user-attachments/assets/a01b0cf1-98f0-4c0f-ac9a-ab6739ea3177" />
+                                             
+<img width="270" height="600" alt="Screenshot_20251025_173458" src="https://github.com/user-attachments/assets/473a0213-bc9f-405c-8d3b-d3d15d8b7198" />
+
+### *El desarrollo de la aplicación sigue en progreso por lo cual las capturas puede que no representan la aplicación final.* 
