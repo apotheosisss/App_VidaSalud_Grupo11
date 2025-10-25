@@ -64,7 +64,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel)
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
-                    label = { Text("Nombre de usuario") },
+                    label = { Text("Nuevo usuario") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -84,7 +84,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel)
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Nueva Contraseña") },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
@@ -108,6 +108,24 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel)
                     )
                 ) {
                     Text(text = "Registrarse")
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = {
+                        navController.navigate("login")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF333333),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = "Volver atrás")
                 }
             }
         }

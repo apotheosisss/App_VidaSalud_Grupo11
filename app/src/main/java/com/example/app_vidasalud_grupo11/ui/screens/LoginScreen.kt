@@ -90,7 +90,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                             val success = loginViewModel.login(username, password)
                             if (success) {
                                 snackbarHostState.showSnackbar("¡Inicio de sesión exitoso!")
-                                // TODO: Navigate to home screen
+                                navController.navigate("inicio/$username")
                             } else {
                                 snackbarHostState.showSnackbar("Usuario o contraseña incorrectos")
                             }

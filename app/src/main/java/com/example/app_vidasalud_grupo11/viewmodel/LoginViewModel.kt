@@ -10,12 +10,17 @@ class LoginViewModel : ViewModel() {
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: StateFlow<List<User>> = _users
 
-    fun register(user: User) {
+    val admin=User("admin","admin","admin") // Crea un usuario administrador
+
+
+
+    fun register(user: User) { // Está función agrega un usuario a la lista de usuarios
         _users.value = _users.value + user
     }
 
     fun login(username: String, pass: String): Boolean {
-        val user = _users.value.find { it.username == username && it.password == pass }
+        _users.value = _users.value + admin // Agrega el usuario administrador a la lista de usuarios
+        val user = _users.value.find { it.username == username && it.password == pass } // busca un usuario en la lista de users
         return user != null
     }
 }
