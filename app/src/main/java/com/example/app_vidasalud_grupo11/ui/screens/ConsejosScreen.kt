@@ -2,6 +2,7 @@ package com.example.app_vidasalud_grupo11.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -15,11 +16,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InicioScreen(navController: NavController, username: String) {
+fun ConsejosScreen(navController: NavController, username: String) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Función para navegar y cerrar el menú
     val navigateToScreen = { route: String ->
         scope.launch {
             drawerState.close()
@@ -38,7 +38,6 @@ fun InicioScreen(navController: NavController, username: String) {
                 ) {
                     Text("Menú", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 16.dp))
 
-                    // Opciones del menú como botones
                     Text("Sueño", modifier = Modifier.fillMaxWidth().clickable { navigateToScreen("sueno") }.padding(12.dp))
                     Text("Consejos", modifier = Modifier.fillMaxWidth().clickable { navigateToScreen("consejos") }.padding(12.dp))
                     Text("Alimentación", modifier = Modifier.fillMaxWidth().clickable { navigateToScreen("alimentacion") }.padding(12.dp))
@@ -59,7 +58,7 @@ fun InicioScreen(navController: NavController, username: String) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Inicio") },
+                    title = { Text("Consejos") },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.apply { if (isClosed) open() else close() } } }) {
                             Icon(
@@ -83,13 +82,61 @@ fun InicioScreen(navController: NavController, username: String) {
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Bienvenido, $username", style = MaterialTheme.typography.headlineMedium)
+                // --- ESPACIOS PARA CONSEJOS ---
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("Consejo 1: Bebe suficiente agua durante el día se´gun tu peso.", color = Color.White)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Presiona en el icono de arriba para abrir el menú", style = MaterialTheme.typography.headlineMedium)
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("Consejo 2: Realiza al menos 30 minutos de actividad física al dia.", color = Color.White)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("Consejo 3: Duerme entre 7 y 8 horas cada noche.", color = Color.White)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center) {
+                        Text("Consejo 4: Recuerda pararte luego de pasar mucho tiempo sentado.", color = Color.White)
+                    }
+                }
             }
         }
     }
