@@ -79,9 +79,5 @@ El proyecto cuenta con una cobertura de pruebas unitarias superior al 80% en la 
 ---
 
 ## 📦 Evidencia de Entrega (APK Firmado)
+<img width="638" height="171" alt="image" src="https://github.com/user-attachments/assets/c6c4ec30-cac0-475a-bf2b-c1f29c9ac0f6" />
 
-### Captura de generación de APK Firmado (Release):
-![APK Generado](capturas/build_cap.png)
-
-### Captura del archivo Keystore (.jks):
-![JKS File](capturas/keystore_cap.png)
