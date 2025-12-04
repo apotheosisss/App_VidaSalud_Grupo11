@@ -12,13 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.app_vidasalud_grupo11.viewmodel.AlimentacionViewModel
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,28 +27,28 @@ fun AlimentacionScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    // 1. Estado para las notificaciones (Snackbar)
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // Observar el estado desde el ViewModel
     val uiState by alimentacionViewModel.uiState.collectAsState()
     val df = DecimalFormat("#.##")
 
-    // Cálculos para el bloque de estadísticas (promedio)
     val diasAnalizados = uiState.diasContador
     val avgCalorias = if (uiState.caloriasList.isNotEmpty()) uiState.caloriasList.average() else 0.0
     val avgProteinas = if (uiState.proteinasList.isNotEmpty()) uiState.proteinasList.average() else 0.0
     val avgGrasas = if (uiState.grasasList.isNotEmpty()) uiState.grasasList.average() else 0.0
 
-    val navigateToScreen = { route: String -> // Función para navegar a pantallas
-        scope.launch { // Lanzar una corrutina para cerrar el menú
+    val navigateToScreen = { route: String ->
+        scope.launch {
             drawerState.close()
-            navController.navigate("$route/$username") // Navegar a la pantalla
+            navController.navigate("$route/$username")
         }
     }
 
-    ModalNavigationDrawer( // Componente para el menú lateral
-        drawerState = drawerState, // Estado del menú lateral
-        drawerContent = { // Contenido del menú lateral
-            ModalDrawerSheet { // Componente para el contenido del menú lateral
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
                 Column(
                     modifier = Modifier.fillMaxWidth(0.7f).padding(16.dp)
                 ) {
@@ -67,9 +65,11 @@ fun AlimentacionScreen(
             }
         }
     ) {
-        Scaffold( // Componente para la estructura de la pantalla
-            topBar = { // Barra superior
-                TopAppBar( // Componente para la barra superior
+        Scaffold(
+            // 2. Conectamos el Snackbar al Scaffold
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                TopAppBar(
                     title = { Text("Alimentación") },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.apply { if (isClosed) open() else close() } } }) {
@@ -89,8 +89,7 @@ fun AlimentacionScreen(
                 modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // input de datos
-
+                // Inputs
                 InputBlock(label = "Calorías consumidas hoy", value = alimentacionViewModel.caloriasInput, onValueChange = alimentacionViewModel::onCaloriasInputChange)
                 Spacer(modifier = Modifier.height(16.dp))
                 InputBlock(label = "Proteínas consumidas hoy (gr)", value = alimentacionViewModel.proteinasInput, onValueChange = alimentacionViewModel::onProteinasInputChange)
@@ -99,15 +98,38 @@ fun AlimentacionScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // boton para guardar los datos del dia
-                Button(onClick = { alimentacionViewModel.addAlimentacionData() }) {
+                // 3. Botón con Validaciones
+                Button(onClick = {
+                    scope.launch {
+                        // A) Validar vacíos
+                        if (alimentacionViewModel.caloriasInput.isBlank() ||
+                            alimentacionViewModel.proteinasInput.isBlank() ||
+                            alimentacionViewModel.grasasInput.isBlank()) {
+                            snackbarHostState.showSnackbar("Por favor, completa todos los campos.")
+                            return@launch
+                        }
+
+                        // B) Validar que sean números
+                        val cal = alimentacionViewModel.caloriasInput.toFloatOrNull()
+                        val pro = alimentacionViewModel.proteinasInput.toFloatOrNull()
+                        val gra = alimentacionViewModel.grasasInput.toFloatOrNull()
+
+                        if (cal == null || pro == null || gra == null) {
+                            snackbarHostState.showSnackbar("Ingresa solo números válidos (sin letras).")
+                            return@launch
+                        }
+
+                        // C) Si todo está bien, guardamos
+                        alimentacionViewModel.addAlimentacionData()
+                        snackbarHostState.showSnackbar("Datos nutricionales guardados correctamente.")
+                    }
+                }) {
                     Text("Guardar Datos del Día")
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // resutlados de los datos
-
+                // Resultados
                 Surface(modifier = Modifier.fillMaxWidth(), color = Color(0xFF333333), shape = RoundedCornerShape(16.dp)) {
                     Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Tus Estadísticas de Alimentación", style = MaterialTheme.typography.titleMedium, color = Color.White)
@@ -124,18 +146,22 @@ fun AlimentacionScreen(
     }
 }
 
-// Composable reutilizable para los bloques de input
 @Composable
 private fun InputBlock(label: String, value: String, onValueChange: (String) -> Unit) {
-    Surface(modifier = Modifier.fillMaxWidth(), color = Color(0xFF333333), shape = RoundedCornerShape(16.dp)) { // Caja de superficie
-
-        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) { // Columna para el bloque de input
+    Surface(modifier = Modifier.fillMaxWidth(), color = Color(0xFF333333), shape = RoundedCornerShape(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             OutlinedTextField(
-                value = value, // Valor actual del campo de texto
-                onValueChange = onValueChange, // Llama a la función de actualización
+                value = value,
+                onValueChange = {
+                    // Opcional: Filtramos para que no puedan escribir letras a nivel de teclado
+                    // aunque la validación final se hace en el botón por seguridad.
+                    if (it.all { char -> char.isDigit() || char == '.' }) {
+                        onValueChange(it)
+                    }
+                },
                 label = { Text(label) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true, // Permite solo una línea de texto
+                singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = Color.White, unfocusedTextColor = Color.White, cursorColor = Color.White,
                     focusedIndicatorColor = Color.White, unfocusedIndicatorColor = Color.LightGray,

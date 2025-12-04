@@ -25,7 +25,7 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel)
 
     // Obtenemos el scope para ejecutar corrutinas (llamadas a internet)
     val scope = rememberCoroutineScope()
-    // Estado para mostrar mensajes (opcional, pero recomendado)
+    // Estado para mostrar mensajes de error o éxito
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -102,17 +102,31 @@ fun RegisterScreen(navController: NavController, loginViewModel: LoginViewModel)
                 Button(
                     onClick = {
                         scope.launch {
-                            // Creamos el usuario con ID null (la base de datos lo genera)
+                            // --- INICIO DE VALIDACIONES ---
+
+                            // 1. Validar campos vacíos
+                            if (username.isBlank() || email.isBlank() || password.isBlank()) {
+                                snackbarHostState.showSnackbar("Por favor, completa todos los campos.")
+                                return@launch
+                            }
+
+                            // 2. Validar formato de correo (que tenga @, dominio, etc.)
+                            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                                snackbarHostState.showSnackbar("El formato del correo electrónico no es válido.")
+                                return@launch
+                            }
+
+                            // --- FIN DE VALIDACIONES ---
+
+                            // Si pasa las validaciones, procedemos al registro
                             val user = User(id = null, username = username, email = email, password = password)
 
-                            // Llamamos al ViewModel (función suspendida)
                             val success = loginViewModel.register(user)
 
                             if (success) {
-                                // Si registró bien, volvemos al login
+                                snackbarHostState.showSnackbar("¡Registro exitoso! Iniciando sesión...")
                                 navController.navigate("login")
                             } else {
-                                // Mostrar error si falla
                                 snackbarHostState.showSnackbar("Error al registrar. Intente nuevamente.")
                             }
                         }
